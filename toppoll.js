@@ -1,18 +1,13 @@
 if (Meteor.isClient) {
-  // counter starts at 0
-  Session.setDefault("counter", 0);
-
-  Template.hello.helpers({
-    counter: function () {
-      return Session.get("counter");
-    }
-  });
-
-  Template.hello.events({
-    'click button': function () {
-      // increment the counter when button is clicked
-      Session.set("counter", Session.get("counter") + 1);
-    }
+  Template.poll.helpers({
+    'polls': [
+        { question: "Bagaimana menurut kamu Meteor itu?",
+          answer: [ { a: "Keren" }, { b: "Bagus" }, { c: "Biasa aja" } ]
+        },
+        { question: "Apakah belajar Meteor menyenangkan?",
+          answer: [ { a: "Tentu saja" }, { b: "Pastinya" }, { c: "Hmmm..." } ]
+        },
+      ]
   });
 }
 

@@ -1,14 +1,17 @@
 <head>
-  <title>toppoll</title>
+  <title>Toppoll</title>
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
+  <h1>Top Poll</h1>
 
-  {{> hello}}
+  <ul>
+    {{> poll}}
+  </ul>
 </body>
 
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+<template name="poll">
+  {{#each polls}}
+    <li>{{question}}</li>
+  {{/each}}
 </template>
