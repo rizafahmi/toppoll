@@ -1,13 +1,10 @@
+Polls = new Mongo.Collection("polls");
+
 if (Meteor.isClient) {
   Template.poll.helpers({
-    'polls': [
-        { question: "Bagaimana menurut kamu Meteor itu?",
-          answer: [ { a: "Keren" }, { b: "Bagus" }, { c: "Biasa aja" } ]
-        },
-        { question: "Apakah belajar Meteor menyenangkan?",
-          answer: [ { a: "Tentu saja" }, { b: "Pastinya" }, { c: "Hmmm..." } ]
-        },
-      ]
+    polls: function () {
+      return Polls.find();
+    }
   });
 }
 
