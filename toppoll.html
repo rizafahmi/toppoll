@@ -3,15 +3,55 @@
 </head>
 
 <body>
-  <h1>Top Poll</h1>
 
-  <ul>
-    {{> poll}}
-  </ul>
+  <div class="container">
+    <div class="row">
+      <h1>Top Poll</h1>
+      <div class="col-md-8">
+        <h3> &gt; New Poll</h3>
+        {{> newPoll}}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8">
+        <h3> &gt; List of Polls</h3>
+        <ul>
+          {{> poll}}
+        </ul>
+      </div>
+    </div>
+  </div>
 </body>
 
 <template name="poll">
   {{#each polls}}
     <li>{{question}}</li>
   {{/each}}
+</template>
+
+<template name="newPoll">
+
+<form class="form-horizontal new-poll" action="">
+  <div class="form-group">
+
+    <textarea id="" class="form-control" name="question" placeholder="Enter your poll question here"></textarea>
+  </div>
+  <div class="form-group">
+    <input class="form-control" type="text" name="answer_a" placeholder="First poll answer">
+  </div>
+  <div class="form-group">
+    <input class="form-control" type="text" name="answer_b" placeholder="Second poll answer">
+  </div>
+  <div class="form-group">
+    <input class="form-control" type="text" name="answer_c" placeholder="third poll answer">
+  </div>
+
+  <div class="form-group">
+    <button class="btn btn-primary" type="submit">Save</button>
+  </div>
+
+</form>
+
+
 </template>
