@@ -26,7 +26,10 @@
 
 <template name="poll">
   {{#each polls}}
-    <li>{{question}}</li>
+    <li>
+      {{question}}
+      <button class="btn btn-danger btn-delete btn-xs" type="button">&times;</button>
+    </li>
   {{/each}}
 </template>
 

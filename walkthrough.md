@@ -110,7 +110,7 @@ Sekarang kita akan buat form untuk add poll baru.
 
 Kok jelek ya... Time to use bootstrap! Buka `https://atmospherejs.com/` search bootstrap. Tambahkan paket bootstrap pilihan kita ke project.
 
-	$> meteor add mizzao:bootstrap-3
+  $> meteor add mizzao:bootstrap-3
 
 Masih keliatan kurang ok sih, mari kita benarkan desain-nya.
 
@@ -234,4 +234,125 @@ Mari kita coba form kita. Yes! It works! Ok, selesai sudah workshop kita hari in
 
 Biar daftar polling-nya ter sorting sesuai tanggal (yg terbaru diatas), kita ubah dikit di bagian query-nya.
 
-	return Polls.find({}, {sort: {createdAt: -1}});
+  return Polls.find({}, {sort: {createdAt: -1}});
+
+# 5. Remove a Poll
+
+Ok, sekarang kita mau coba buat supaya bisa hapus polling yg udah kita buat.
+Pertama-tama kita tambah tombol delete-nya dulu di template html.
+
+
+    <head>
+      <title>Toppoll</title>
+    </head>
+
+    <body>
+
+      <div class="container">
+        <div class="row">
+          <h1>Top Poll</h1>
+          <div class="col-md-8">
+            <h3> &gt; New Poll</h3>
+            {{> newPoll}}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-8">
+            <h3> &gt; List of Polls</h3>
+            <ul>
+              {{> poll}}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </body>
+
+    <template name="poll">
+      {{#each polls}}
+        <li>
+          {{question}}
+          <button class="btn btn-danger btn-delete btn-xs" type="button">&times;</button>
+        </li>
+      {{/each}}
+    </template>
+
+    <template name="newPoll">
+
+    <form class="form-horizontal new-poll" action="">
+      <div class="form-group">
+
+        <textarea id="" class="form-control" name="question" placeholder="Enter your poll question here"></textarea>
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="text" name="answer_a" placeholder="First poll answer">
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="text" name="answer_b" placeholder="Second poll answer">
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="text" name="answer_c" placeholder="third poll answer">
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary" type="submit">Save</button>
+      </div>
+
+    </form>
+
+
+    </template>
+
+Ok, sekarang mari kita buat delete button berfungsi.
+
+
+    Polls = new Mongo.Collection("polls");
+
+    if (Meteor.isClient) {
+      Template.poll.helpers({
+        polls: function () {
+          return Polls.find({}, {sort: {createdAt: -1}});
+        }
+      });
+
+      Template.poll.events({
+        'click .btn-delete': function () {
+          Polls.remove(this._id);
+        }
+      });
+
+      Template.newPoll.events({
+        'submit .new-poll': function (e) {
+          var question = e.target.question.value;
+          var answer_a = e.target.answer_a.value;
+          var answer_b = e.target.answer_b.value;
+          var answer_c = e.target.answer_c.value;
+
+          Polls.insert({
+            question: question,
+            answer_a: answer_a,
+            answer_b: answer_b,
+            answer_c: answer_c,
+            createdAt: new Date()
+          });
+
+          e.target.question.value = "";
+          e.target.answer_a.value = "";
+          e.target.answer_b.value = "";
+          e.target.answer_c.value = "";
+
+          return false;
+
+        }
+      });
+    }
+
+    if (Meteor.isServer) {
+      Meteor.startup(function () {
+        // code to run on server at startup
+      });
+    }
+
+Sekarang yuk kita coba mendelete beberapa polling yg kita buat sebelumnya.
+
+Tuh, keren kan?

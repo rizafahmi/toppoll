@@ -7,6 +7,12 @@ if (Meteor.isClient) {
     }
   });
 
+  Template.poll.events({
+    'click .btn-delete': function () {
+      Polls.remove(this._id);
+    }
+  });
+
   Template.newPoll.events({
     'submit .new-poll': function (e) {
       var question = e.target.question.value;
