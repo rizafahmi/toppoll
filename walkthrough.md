@@ -356,3 +356,11 @@ Ok, sekarang mari kita buat delete button berfungsi.
 Sekarang yuk kita coba mendelete beberapa polling yg kita buat sebelumnya.
 
 Tuh, keren kan?
+
+# 6. Enhanced List of Polls
+
+Sekarang yuk kita bikin list of polls lebih bagus dan lebih terstruktur. Seperti
+menggunakan table, terus bisa diklik untuk menuju ke poll yg bisa kita vote rame-rame.
+Buka html file dan bikin tabel untuk list of poll.
+
+

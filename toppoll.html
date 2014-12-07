@@ -14,7 +14,7 @@
     </div>
 
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-md-10">
         <h3> &gt; List of Polls</h3>
         <ul>
           {{> poll}}
@@ -25,12 +25,25 @@
 </body>
 
 <template name="poll">
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>Questions</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
   {{#each polls}}
-    <li>
-      {{question}}
-      <button class="btn btn-danger btn-delete btn-xs" type="button">&times;</button>
-    </li>
+  <tr>
+    <td>{{question}}</td>
+    <td>
+      <button class="btn btn-warning btn-vote btn-sm" type="button">Vote Now</button> 
+      <button class="btn btn-danger btn-delete btn-sm" type="button">Delete</button>
+    </td>
+  </tr>
   {{/each}}
+  </tbody>
+</table>
 </template>
 
 <template name="newPoll">
