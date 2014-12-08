@@ -4,25 +4,34 @@
 
 <body>
 
-  <div class="container">
-    <div class="row">
-      <h1>Top Poll</h1>
-      <div class="col-md-8">
-        <h3> &gt; New Poll</h3>
-        {{> newPoll}}
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-10">
-        <h3> &gt; List of Polls</h3>
-        <ul>
-          {{> poll}}
-        </ul>
-      </div>
-    </div>
-  </div>
 </body>
+
+<template name="layout">
+
+  <div class="container">
+    {{> yield}}
+  </div>
+
+</template>
+
+<template name="index">
+<div class="row">
+  <h1>Top Poll</h1>
+  <div class="col-md-8">
+    <h3> &gt; New Poll</h3>
+    {{> newPoll}}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-10">
+    <h3> &gt; List of Polls</h3>
+    <ul>
+      {{> poll}}
+    </ul>
+  </div>
+</div>
+</template>
 
 <template name="poll">
 <table class="table table-striped">

@@ -1,6 +1,18 @@
 Polls = new Mongo.Collection("polls");
 
+
+Router.configure({
+  layoutTemplate: 'layout'
+});
+
+Router.map( function () {
+  this.route('index', {path: '/'});
+  this.route('vote', {path: '/vote'});
+});
+
 if (Meteor.isClient) {
+
+
   Template.poll.helpers({
     polls: function () {
       return Polls.find({}, {sort: {createdAt: -1}});
