@@ -362,7 +362,227 @@ Tuh, keren kan?
 Sekarang yuk kita bikin list of polls lebih bagus dan lebih terstruktur. Seperti
 menggunakan table, terus bisa diklik untuk menuju ke poll yg bisa kita vote rame-rame.
 Buka html file dan bikin tabel untuk list of poll.
+    <head>
+      <title>Toppoll</title>
+    </head>
 
+    <body>
+
+      <div class="container">
+        <div class="row">
+          <h1>Top Poll</h1>
+          <div class="col-md-8">
+            <h3> &gt; New Poll</h3>
+            {{> newPoll}}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-10">
+            <h3> &gt; List of Polls</h3>
+            <ul>
+              {{> poll}}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </body>
+
+    <template name="poll">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Questions</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{#each polls}}
+      <tr>
+        <td>{{question}}</td>
+        <td>
+          <button class="btn btn-warning btn-vote btn-sm" type="button">Vote Now</button> 
+          <button class="btn btn-danger btn-delete btn-sm" type="button">Delete</button>
+        </td>
+      </tr>
+      {{/each}}
+      </tbody>
+    </table>
+    </template>
+
+    <template name="newPoll">
+
+    <form class="form-horizontal new-poll" action="">
+      <div class="form-group">
+
+        <textarea id="" class="form-control" name="question" placeholder="Enter your poll question here"></textarea>
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="text" name="answer_a" placeholder="First poll answer">
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="text" name="answer_b" placeholder="Second poll answer">
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="text" name="answer_c" placeholder="third poll answer">
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary" type="submit">Save</button>
+      </div>
+
+    </form>
+
+
+    </template>
+
+Nah, sekarang terlihat lebih bagus, bukan?!
+
+# 7. Voting Time!
+
+Nah sekarang kita mau bikin kalo user klik tombol 'Vote Now' akan buka semacam modal
+untuk voting. Yuk kita bikin modal di html file kita.
+
+
+    <!-- MODAL -->
+    <div id="voteModal" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title">{{selectedVote.question}}</h4>
+          </div>
+          <div class="modal-body">
+            <table class="table table-striped">
+              <tbody>
+                <tr>
+                  <td>{{selectedVote.answer_a}}</td>
+                  <td><strong>{{selectedVote.count_a}}</strong></td>
+                  <td><button class="btn btn-sm btn-vote-a btn-success">Vote!</button></td>
+                </tr>
+                <tr>
+                  <td>{{selectedVote.answer_b}}</td>
+                  <td><strong>{{selectedVote.count_b}}</strong></td>
+                  <td><button class="btn btn-sm btn-vote-b btn-success">Vote!</button></td>
+                </tr>
+                <tr>
+                  <td>{{selectedVote.answer_c}}</td>
+                  <td><strong>{{selectedVote.count_c}}</strong></td>
+                  <td><button class="btn btn-sm btn-vote-c btn-success">Vote!</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+Jangan lupa kalo kita klik button 'Vote Now' men-trigger modal-nya.
+
+    <button class="btn btn-warning btn-vote btn-sm" data-toggle="modal" data-target="#voteModal" type="button">Vote Now</button> 
+
+Sekarang ke javascript file. Pertama, kalo button 'Vote Now' di klik, kita akan set
+session yg menyimpan vote id.
+
+    Template.poll.events({
+      'click .btn-delete': function () {
+        Polls.remove(this._id);
+      },
+      'click .btn-vote': function () {
+        Session.set('selectedVote', this._id);
+      }
+    });
+
+
+Begitu vote id tersedia, kita select di database dan ditampilkan di modal.
+
+    Template.poll.helpers({
+      polls: function () {
+        return Polls.find({}, {sort: {createdAt: -1}});
+      },
+      selectedVote: function () {
+        var vote = Polls.findOne(Session.get("selectedVote"));
+        return vote ;
+      }
+    });
+
+Sekarang kita tampilkan di html. Kita pake if untuk cek kalo data sudah tersedia
+maka modal akan dimunculkan. Kalo ngga ada data, modal tidak akan muncul. Kita
+taro modal ini didalam template poll supaya masih didalam satu konteks.
+
+    {{# if selectedVote}}
+      <!-- MODAL -->
+      <div id="voteModal" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">{{selectedVote.question}}</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table table-striped">
+                <tbody>
+                  <tr>
+                    <td>{{selectedVote.answer_a}}</td>
+                    <td><strong>{{selectedVote.count_a}}</strong></td>
+                    <td><button class="btn btn-sm btn-vote-a btn-success">Vote!</button></td>
+                  </tr>
+                  <tr>
+                    <td>{{selectedVote.answer_b}}</td>
+                    <td><strong>{{selectedVote.count_b}}</strong></td>
+                    <td><button class="btn btn-sm btn-vote-b btn-success">Vote!</button></td>
+                  </tr>
+                  <tr>
+                    <td>{{selectedVote.answer_c}}</td>
+                    <td><strong>{{selectedVote.count_c}}</strong></td>
+                    <td><button class="btn btn-sm btn-vote-c btn-success">Vote!</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+    {{/if}}
+
+Selanjutnya kita bikin tiga button vote itu berfungsi. Setiap kali klik kita dapat id-nya,
+terus count-nya di increment.
+
+    Template.poll.events({
+      'click .btn-delete': function () {
+        Polls.remove(this._id);
+      },
+      'click .btn-vote': function () {
+        Session.set('selectedVote', this._id);
+      },
+      'click .btn-vote-a': function () {
+        var id = Session.get('selectedVote');
+        Polls.update({_id: id}, {$inc: { count_a: 1 }});
+      },
+      'click .btn-vote-b': function () {
+        var id = Session.get('selectedVote');
+        Polls.update({_id: id}, {$inc: { count_b: 1 }});
+
+      },
+      'click .btn-vote-c': function () {
+
+        var id = Session.get('selectedVote');
+        Polls.update({_id: id}, {$inc: { count_c: 1 }});
+      },
+    });
+
+Sekarang yuk kita coba. Keren kan?! Coba lihat di database, beneran nambah ngga datanya di database.
+
+
+# Reset Vote
+
+# Edit Vote
 
     <head>
       <title>Toppoll</title>

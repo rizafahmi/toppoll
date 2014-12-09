@@ -4,34 +4,26 @@
 
 <body>
 
-</body>
-
-<template name="layout">
-
   <div class="container">
-    {{> yield}}
+    <div class="row">
+      <h1>Top Poll</h1>
+      <div class="col-md-8">
+        <h3> &gt; New Poll</h3>
+        {{> newPoll}}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-10">
+        <h3> &gt; List of Polls</h3>
+        <ul>
+          {{> poll}}
+        </ul>
+      </div>
+    </div>
   </div>
 
-</template>
-
-<template name="index">
-<div class="row">
-  <h1>Top Poll</h1>
-  <div class="col-md-8">
-    <h3> &gt; New Poll</h3>
-    {{> newPoll}}
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-10">
-    <h3> &gt; List of Polls</h3>
-    <ul>
-      {{> poll}}
-    </ul>
-  </div>
-</div>
-</template>
+</body>
 
 <template name="poll">
 <table class="table table-striped">
@@ -46,13 +38,51 @@
   <tr>
     <td>{{question}}</td>
     <td>
-      <button class="btn btn-warning btn-vote btn-sm" type="button">Vote Now</button> 
+      <button class="btn btn-warning btn-vote btn-sm" data-toggle="modal" data-target="#voteModal" type="button">Vote Now</button> 
       <button class="btn btn-danger btn-delete btn-sm" type="button">Delete</button>
     </td>
   </tr>
   {{/each}}
   </tbody>
 </table>
+
+{{# if selectedVote}}
+  <!-- MODAL -->
+  <div id="voteModal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title">{{selectedVote.question}}</h4>
+        </div>
+        <div class="modal-body">
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td>{{selectedVote.answer_a}}</td>
+                <td><strong>{{selectedVote.count_a}}</strong></td>
+                <td><button class="btn btn-sm btn-vote-a btn-success">Vote!</button></td>
+              </tr>
+              <tr>
+                <td>{{selectedVote.answer_b}}</td>
+                <td><strong>{{selectedVote.count_b}}</strong></td>
+                <td><button class="btn btn-sm btn-vote-b btn-success">Vote!</button></td>
+              </tr>
+              <tr>
+                <td>{{selectedVote.answer_c}}</td>
+                <td><strong>{{selectedVote.count_c}}</strong></td>
+                <td><button class="btn btn-sm btn-vote-c btn-success">Vote!</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+{{/if}}
 </template>
 
 <template name="newPoll">

@@ -1,28 +1,40 @@
 Polls = new Mongo.Collection("polls");
 
 
-Router.configure({
-  layoutTemplate: 'layout'
-});
-
-Router.map( function () {
-  this.route('index', {path: '/'});
-  this.route('vote', {path: '/vote'});
-});
-
 if (Meteor.isClient) {
 
 
   Template.poll.helpers({
     polls: function () {
       return Polls.find({}, {sort: {createdAt: -1}});
+    },
+    selectedVote: function () {
+      var vote = Polls.findOne(Session.get("selectedVote"));
+      return vote ;
     }
   });
 
   Template.poll.events({
     'click .btn-delete': function () {
       Polls.remove(this._id);
-    }
+    },
+    'click .btn-vote': function () {
+      Session.set('selectedVote', this._id);
+    },
+    'click .btn-vote-a': function () {
+      var id = Session.get('selectedVote');
+      Polls.update({_id: id}, {$inc: { count_a: 1 }});
+    },
+    'click .btn-vote-b': function () {
+      var id = Session.get('selectedVote');
+      Polls.update({_id: id}, {$inc: { count_b: 1 }});
+
+    },
+    'click .btn-vote-c': function () {
+
+      var id = Session.get('selectedVote');
+      Polls.update({_id: id}, {$inc: { count_c: 1 }});
+    },
   });
 
   Template.newPoll.events({
