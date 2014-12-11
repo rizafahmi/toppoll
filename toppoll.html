@@ -58,21 +58,13 @@
         <div class="modal-body">
           <table class="table table-striped">
             <tbody>
+              {{#each pollAnswers}}
               <tr>
-                <td>{{selectedVote.answer_a}}</td>
-                <td><strong>{{selectedVote.count_a}}</strong></td>
-                <td><button class="btn btn-sm btn-vote-a btn-success">Vote!</button></td>
+                <td>{{answer}}</td>
+                <td><strong>{{count}}</strong></td>
+                <td><button class="btn btn-sm btn-vote-count btn-success">Vote!</button></td>
               </tr>
-              <tr>
-                <td>{{selectedVote.answer_b}}</td>
-                <td><strong>{{selectedVote.count_b}}</strong></td>
-                <td><button class="btn btn-sm btn-vote-b btn-success">Vote!</button></td>
-              </tr>
-              <tr>
-                <td>{{selectedVote.answer_c}}</td>
-                <td><strong>{{selectedVote.count_c}}</strong></td>
-                <td><button class="btn btn-sm btn-vote-c btn-success">Vote!</button></td>
-              </tr>
+              {{/each}}
             </tbody>
           </table>
         </div>

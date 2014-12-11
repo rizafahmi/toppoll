@@ -1,4 +1,5 @@
 Polls = new Mongo.Collection("polls");
+PollAnswers = new Mongo.Collection("pollAnswer");
 
 
 if (Meteor.isClient) {
@@ -11,6 +12,10 @@ if (Meteor.isClient) {
     selectedVote: function () {
       var vote = Polls.findOne(Session.get("selectedVote"));
       return vote ;
+    },
+    pollAnswers: function () {
+      var answers = PollAnswers.find({pollId: Session.get("selectedVote")}, {sort: {count: -1}});
+      return answers;
     }
   });
 
@@ -21,19 +26,9 @@ if (Meteor.isClient) {
     'click .btn-vote': function () {
       Session.set('selectedVote', this._id);
     },
-    'click .btn-vote-a': function () {
-      var id = Session.get('selectedVote');
-      Polls.update({_id: id}, {$inc: { count_a: 1 }});
-    },
-    'click .btn-vote-b': function () {
-      var id = Session.get('selectedVote');
-      Polls.update({_id: id}, {$inc: { count_b: 1 }});
-
-    },
-    'click .btn-vote-c': function () {
-
-      var id = Session.get('selectedVote');
-      Polls.update({_id: id}, {$inc: { count_c: 1 }});
+    'click .btn-vote-count': function () {
+      var id = this._id;
+      PollAnswers.update({_id: id}, {$inc: { count: 1 }});
     },
   });
 
@@ -44,12 +39,25 @@ if (Meteor.isClient) {
       var answer_b = e.target.answer_b.value;
       var answer_c = e.target.answer_c.value;
 
-      Polls.insert({
+      var poll = Polls.insert({
         question: question,
-        answer_a: answer_a,
-        answer_b: answer_b,
-        answer_c: answer_c,
         createdAt: new Date()
+      });
+
+      console.log(poll);
+      PollAnswers.insert({
+        pollId: poll,
+        answer: answer_a
+      });
+
+      PollAnswers.insert({
+        pollId: poll,
+        answer: answer_b
+      });
+
+      PollAnswers.insert({
+        pollId: poll,
+        answer: answer_c
       });
 
       e.target.question.value = "";
