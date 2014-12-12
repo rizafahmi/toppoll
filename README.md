@@ -177,6 +177,7 @@ Sudah kelihatan better, kan?!
 Sekarang mari kita bikin form polling baru berfungsi. Buka javascript file.
 
     Polls = new Mongo.Collection("polls");
+    PollAnswers = new Mongo.Collection("pollAnswer");
 
     if (Meteor.isClient) {
       Template.poll.helpers({
@@ -211,6 +212,21 @@ Sekarang mari kita bikin form polling baru berfungsi. Buka javascript file.
             answer_b: answer_b,
             answer_c: answer_c,
             createdAt: new Date()
+          });
+
+          PollAnswers.insert({
+            pollId: poll,
+            answer: answer_a
+          });
+
+          PollAnswers.insert({
+            pollId: poll,
+            answer: answer_b
+          });
+
+          PollAnswers.insert({
+            pollId: poll,
+            answer: answer_c
           });
 
           e.target.question.value = "";
@@ -306,50 +322,14 @@ Pertama-tama kita tambah tombol delete-nya dulu di template html.
 Ok, sekarang mari kita buat delete button berfungsi.
 
 
-    Polls = new Mongo.Collection("polls");
 
     if (Meteor.isClient) {
-      Template.poll.helpers({
-        polls: function () {
-          return Polls.find({}, {sort: {createdAt: -1}});
-        }
-      });
+      ...
 
       Template.poll.events({
         'click .btn-delete': function () {
           Polls.remove(this._id);
         }
-      });
-
-      Template.newPoll.events({
-        'submit .new-poll': function (e) {
-          var question = e.target.question.value;
-          var answer_a = e.target.answer_a.value;
-          var answer_b = e.target.answer_b.value;
-          var answer_c = e.target.answer_c.value;
-
-          Polls.insert({
-            question: question,
-            answer_a: answer_a,
-            answer_b: answer_b,
-            answer_c: answer_c,
-            createdAt: new Date()
-          });
-
-          e.target.question.value = "";
-          e.target.answer_a.value = "";
-          e.target.answer_b.value = "";
-          e.target.answer_c.value = "";
-
-          return false;
-
-        }
-      });
-    }
-
-    if (Meteor.isServer) {
-      Meteor.startup(function () {
-        // code to run on server at startup
       });
     }
 
@@ -444,41 +424,35 @@ Nah sekarang kita mau bikin kalo user klik tombol 'Vote Now' akan buka semacam m
 untuk voting. Yuk kita bikin modal di html file kita.
 
 
-    <!-- MODAL -->
-    <div id="voteModal" class="modal fade">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title">{{selectedVote.question}}</h4>
-          </div>
-          <div class="modal-body">
-            <table class="table table-striped">
-              <tbody>
-                <tr>
-                  <td>{{selectedVote.answer_a}}</td>
-                  <td><strong>{{selectedVote.count_a}}</strong></td>
-                  <td><button class="btn btn-sm btn-vote-a btn-success">Vote!</button></td>
-                </tr>
-                <tr>
-                  <td>{{selectedVote.answer_b}}</td>
-                  <td><strong>{{selectedVote.count_b}}</strong></td>
-                  <td><button class="btn btn-sm btn-vote-b btn-success">Vote!</button></td>
-                </tr>
-                <tr>
-                  <td>{{selectedVote.answer_c}}</td>
-                  <td><strong>{{selectedVote.count_c}}</strong></td>
-                  <td><button class="btn btn-sm btn-vote-c btn-success">Vote!</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    {{# if selectedVote}}
+      <!-- MODAL -->
+      <div id="voteModal" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">{{selectedVote.question}}</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table table-striped">
+                <tbody>
+                  {{#each pollAnswers}}
+                  <tr>
+                    <td>{{answer}}</td>
+                    <td><strong>{{count}}</strong></td>
+                    <td><button class="btn btn-sm btn-vote-count btn-success">Vote!</button></td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+    {{/if}}
 
 Jangan lupa kalo kita klik button 'Vote Now' men-trigger modal-nya.
 
@@ -497,7 +471,8 @@ session yg menyimpan vote id.
     });
 
 
-Begitu vote id tersedia, kita select di database dan ditampilkan di modal.
+Begitu vote id tersedia, kita select di database dan ditampilkan di modal. Termasuk
+kita select semua answer yg terkait dengan vote question tadi.
 
     Template.poll.helpers({
       polls: function () {
@@ -506,6 +481,10 @@ Begitu vote id tersedia, kita select di database dan ditampilkan di modal.
       selectedVote: function () {
         var vote = Polls.findOne(Session.get("selectedVote"));
         return vote ;
+      },
+      pollAnswers: function () {
+        var answers = PollAnswers.find({pollId: Session.get("selectedVote")}, {sort: {count: -1}});
+        return answers;
       }
     });
 
@@ -516,38 +495,7 @@ taro modal ini didalam template poll supaya masih didalam satu konteks.
     {{# if selectedVote}}
       <!-- MODAL -->
       <div id="voteModal" class="modal fade">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-              <h4 class="modal-title">{{selectedVote.question}}</h4>
-            </div>
-            <div class="modal-body">
-              <table class="table table-striped">
-                <tbody>
-                  <tr>
-                    <td>{{selectedVote.answer_a}}</td>
-                    <td><strong>{{selectedVote.count_a}}</strong></td>
-                    <td><button class="btn btn-sm btn-vote-a btn-success">Vote!</button></td>
-                  </tr>
-                  <tr>
-                    <td>{{selectedVote.answer_b}}</td>
-                    <td><strong>{{selectedVote.count_b}}</strong></td>
-                    <td><button class="btn btn-sm btn-vote-b btn-success">Vote!</button></td>
-                  </tr>
-                  <tr>
-                    <td>{{selectedVote.answer_c}}</td>
-                    <td><strong>{{selectedVote.count_c}}</strong></td>
-                    <td><button class="btn btn-sm btn-vote-c btn-success">Vote!</button></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-          </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
+      ...
       </div><!-- /.modal -->
     {{/if}}
 
@@ -561,19 +509,9 @@ terus count-nya di increment.
       'click .btn-vote': function () {
         Session.set('selectedVote', this._id);
       },
-      'click .btn-vote-a': function () {
-        var id = Session.get('selectedVote');
-        Polls.update({_id: id}, {$inc: { count_a: 1 }});
-      },
-      'click .btn-vote-b': function () {
-        var id = Session.get('selectedVote');
-        Polls.update({_id: id}, {$inc: { count_b: 1 }});
-
-      },
-      'click .btn-vote-c': function () {
-
-        var id = Session.get('selectedVote');
-        Polls.update({_id: id}, {$inc: { count_c: 1 }});
+      'click .btn-vote-count': function () {
+        var id = this._id;
+        PollAnswers.update({_id: id}, {$inc: { count: 1 }});
       },
     });
 
